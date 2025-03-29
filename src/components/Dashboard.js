@@ -14,8 +14,8 @@ const data = [
     title: "US Senate Election 1967-2022",
     dashboards: [
       {
-        "name" : "Region Map",
-        "link" : "https://public.tableau.com/views/athhuk/Dashboard2?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
+        "name" : "Distribution by State and Year",
+        "link" : "https://public.tableau.com/views/Book3_17425929926010/Sheet1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
       },
       {
         "name" : "Total Votes",
