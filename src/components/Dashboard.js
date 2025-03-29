@@ -18,7 +18,7 @@ const data = [
         "link" : "https://public.tableau.com/views/Book3_17425929926010/Sheet1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
       },
       {
-        "name" : "Total Votes",
+        "name" : "Total Votes by state",
         "link" : "https://public.tableau.com/shared/M5BF4XRNX?:display_count=n&:origin=viz_share_link"
       },
     ]
