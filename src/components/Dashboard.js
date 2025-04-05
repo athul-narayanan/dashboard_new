@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -6,39 +6,9 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import DashBoardItem from "./DashBoardItem"
+import { getDashBoard } from '../services/dashboard';
 
-// Need to be replaced with actual data
-const data = [
-  {
-    type: "us-senate-election",
-    title: "US Senate Election 1967-2022",
-    dashboards: [
-      {
-        "name" : "Distribution by State and Year",
-        "link" : "https://public.tableau.com/views/Book3_17425929926010/Sheet1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
-      },
-      {
-        "name" : "Total Votes by state",
-        "link" : "https://public.tableau.com/shared/M5BF4XRNX?:display_count=n&:origin=viz_share_link"
-      },
-    ]
-  },
-  {
-    type: "crime",
-    title: "Crime Data",
-    dashboards: [
-      {
-        "name" : "Crime By Region",
-        "link" : "https://public.tableau.com/views/LearnEmbeddedAnalytics/SalesOverviewDashboard?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
-      },
-      {
-        "name" : "Crime Rate By Year",
-        "link" : "https://public.tableau.com/views/PublicSectorEmergencyCallsDashboardB2VBRWFD/Overview?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"
-      },
-    ]
-  }
-]
-const NAVIGATION = [
+let NAVIGATION = [
 ];
 
 const demoTheme = extendTheme({
@@ -73,28 +43,44 @@ export default function DashboardLayoutBasic(props) {
   const { window } = props;
   const [navigation, setNavigation] = React.useState(NAVIGATION)
   const router = useDemoRouter('/dashboard');
+  const [dashboards, setDashBoards] = useState([])
+
+  useEffect(()=>{
+    getDashBoardList()
+  }, [])
+
+  const getDashBoardList = async()=>{
+    try{
+      const result = await getDashBoard()
+      setDashBoards(result.data)
+    }catch(error){
+      console.log(error)
+    }
+  }
 
   React.useEffect(()=>{
-    const dashboard= {
-      segment: 'dashboard',
-      title: 'Dashboard',
-      icon: <DashboardIcon />,
-      children: [
-      ],
-    }
-    data.forEach((item)=>{
-      dashboard.children.push({
-        segment: item.type,
-        title: item.title,
-        dashboards: item.dashboards,
-        icon: <DescriptionIcon />
+    
+      const dashboard= {
+        segment: 'dashboard',
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+        children: [
+        ],
+      }
+      dashboards.forEach((item)=>{
+        dashboard.children.push({
+          segment: item.type,
+          title: item.title,
+          dashboards: item.dashboards,
+          icon: <DescriptionIcon />
+        })
+        
       })
-      
-    })
-    NAVIGATION.push(dashboard)
-    console.log(NAVIGATION)
-    setNavigation(NAVIGATION)
-  },[])
+      NAVIGATION = [dashboard]
+      console.log(NAVIGATION)
+      setNavigation(NAVIGATION)
+    
+  },[dashboards])
 
   return (
     <AppProvider
