@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import TableauReport from 'tableau-react';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import "./Dashboard.css"
 
 
 const DashBoardItem = (props) => {

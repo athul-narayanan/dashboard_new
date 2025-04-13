@@ -1,0 +1,16 @@
+#debug-container {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+@keyframes hideDebug {
+    0% { display: none; }
+  }
+  
+  #debug-container {
+    animation: hideDebug 0s;
+    display: none !important;
+  }
