@@ -57,10 +57,9 @@ function TablePaginationActions(props) {
 export default function Recommendation() {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
-        const [recommendations, setRecommendations] = useState([]);
+    const [recommendations, setRecommendations] = useState(null);
 
-
-    const [page, setPage] = useState(0); // 0-indexed
+    const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [countryList, setCountryList] = useState([]);
@@ -94,9 +93,7 @@ export default function Recommendation() {
         }
     };
 
-    const handleChangePage = (_, newPage) => {
-        setPage(newPage);
-    };
+    const handleChangePage = (_, newPage) => setPage(newPage);
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
@@ -116,8 +113,9 @@ export default function Recommendation() {
                         onChange={(e) => {
                             setSelectedCountry(e.target.value);
                             setPage(0);
+                            setUserData([]);
                             setSelectedUser(null);
-                            setRecommendations([]);
+                            setRecommendations(null);
                         }}
                     >
                         {countryList.map((item) => (
@@ -154,12 +152,11 @@ export default function Recommendation() {
                                                 variant="contained"
                                                 onClick={async () => {
                                                     setSelectedUser(user);
-                                                    console.log(user);
                                                     try {
                                                         const res = await getRecommendations(user.country, user.customer_id);
                                                         setRecommendations(res.recommended_products);
                                                     } catch (error) {
-                                                        setRecommendations([]);
+                                                        setRecommendations(null);
                                                     }
                                                 }}
                                             >
@@ -189,25 +186,33 @@ export default function Recommendation() {
 
                 {/* Right - Recommendations */}
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ marginBottom: '8px' }}>ML Recommendation</Typography>
+                    <Typography variant="h6" sx={{ marginBottom: '8px' }}>
+                        ML Recommendation
+                        {selectedUser && recommendations?.recommended_items?.length > 0 &&
+                            ` For ----- Customer ID ${selectedUser.customer_id} ----- Hit Rate ${recommendations.hit_rate}`}
+                    </Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Recommended Products {selectedUser && recommendations.length > 0 ? 'For Customer_Id ' + selectedUser.customer_id : '' }</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Recommended Products</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {selectedUser && recommendations.length > 0 ? (
-                                    recommendations.map((rec, idx) => (
+                                {!selectedUser ? (
+                                    <TableRow>
+                                        <TableCell>Select a user to view recommendations</TableCell>
+                                    </TableRow>
+                                ) : !recommendations?.recommended_items?.length ? (
+                                    <TableRow>
+                                        <TableCell>No recommendations available for this user.</TableCell>
+                                    </TableRow>
+                                ) : (
+                                    recommendations.recommended_items.map((rec, idx) => (
                                         <TableRow key={idx}>
                                             <TableCell>{rec}</TableCell>
                                         </TableRow>
                                     ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell>Select a user to view recommendations</TableCell>
-                                    </TableRow>
                                 )}
                             </TableBody>
                         </Table>
