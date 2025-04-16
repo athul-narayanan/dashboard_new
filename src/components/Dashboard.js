@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DescriptionIcon from '@mui/icons-material/Description';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
+import { extendTheme } from '@mui/material/styles';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import DashBoardItem from "./DashBoardItem"
+import React, { useEffect, useState } from 'react';
 import { getDashBoard } from '../services/dashboard';
+import DashBoardItem from "./DashBoardItem";
 import Recommendation from './Recommendation';
-import RecommDashboard from './RecommDashboard';
 
 let NAVIGATION = [
 ];
@@ -81,21 +79,9 @@ export default function DashboardLayoutBasic(props) {
     })
 
     const recommendationNav = {
-      segment: 'ecom',
-      title: 'E-Commerce',
-      icon: <ShoppingCartIcon />,
-      children: [
-        {
-          segment: 'dashboard',
-          title: 'Dashboard',
-          icon: <DashboardIcon />,
-        },
-        {
-          segment: 'recommendation',
-          title: 'Recommendation',
-          icon: <PrecisionManufacturingIcon />,
-        },
-      ],
+      segment: 'recommendation',
+      title: 'E-Com Recommendation',
+      icon: <PrecisionManufacturingIcon />
     };
 
     NAVIGATION = [dashboard, recommendationNav]
@@ -106,9 +92,7 @@ export default function DashboardLayoutBasic(props) {
 
   const renderContent = () => {
     switch (router.pathname) {
-      case '/ecom/dashboard':
-        return <RecommDashboard />;
-      case '/ecom/recommendation':
+      case '/recommendation':
         return <Recommendation />;
   
       default:

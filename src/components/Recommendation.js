@@ -1,7 +1,3 @@
-import FirstPageIcon from '@mui/icons-material/FirstPage';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import LastPageIcon from '@mui/icons-material/LastPage';
 import {
     Box,
     FormControl,
@@ -14,22 +10,15 @@ import {
     TableHead,
     TablePagination, TableRow,
     Typography,
+    Button
 } from '@mui/material';
-import Button from '@mui/material/Button';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { getCountyList } from '../services/ecom';
-
-
-const countryList = ['USA', 'India', 'Germany', 'Japan'];
-
-const mockUsers = Array.from({ length: 23 }, (_, i) => ({
-    id: i + 1,
-    totalInvoice: 10000 + i,
-    totalProducts: 5000 + i * 3,
-    country: countryList[i % countryList.length],
-    recommendations: ['Product 1', 'Product 2'],
-}));
+import { getCountyList, getEcomUsers, getRecommendations } from '../services/ecom';
 
 function TablePaginationActions(props) {
     const theme = useTheme();
@@ -68,48 +57,51 @@ function TablePaginationActions(props) {
 export default function Recommendation() {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(8);
+        const [recommendations, setRecommendations] = useState([]);
+
+
+    const [page, setPage] = useState(0); // 0-indexed
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [countryList, setCountryList] = useState([]);
+    const [userData, setUserData] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
         const loadCountries = async () => {
             const res = await getCountyList();
             if (res.status === 200) {
-                console.log(res);
                 setCountryList(res.data);
-            } else {
-                console.error('Failed to load countries:', res);
             }
         };
-    
         loadCountries();
     }, []);
 
-    const getCountryList = async () => {
-        try {
-            const result = await getCountyList()
-            setCountryList(result.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    useEffect(() => {
+        if (selectedCountry) fetchUsers();
+    }, [selectedCountry, page, rowsPerPage]);
 
-    const handleChangePage = (_, newPage) => setPage(newPage);
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 8));
-        setPage(0);
+    const fetchUsers = async () => {
+        try {
+            const res = await getEcomUsers({
+                country: selectedCountry,
+                page: page + 1
+            });
+            setUserData(res.results);
+            setTotalCount(res.count);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const emptyRows =
-        page > 0
-            ? Math.max(0, (1 + page) * rowsPerPage - mockUsers.length)
-            : 0;
+    const handleChangePage = (_, newPage) => {
+        setPage(newPage);
+    };
 
-    const visibleRows = rowsPerPage > 0
-        ? mockUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        : mockUsers;
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     return (
         <Box>
@@ -121,50 +113,67 @@ export default function Recommendation() {
                         labelId="country-label"
                         value={selectedCountry}
                         label="Country"
-                        onChange={(e) => setSelectedCountry(e.target.value)}
+                        onChange={(e) => {
+                            setSelectedCountry(e.target.value);
+                            setPage(0);
+                            setSelectedUser(null);
+                            setRecommendations([]);
+                        }}
                     >
-                        {countryList?.map((item) => (
-                            <MenuItem key={item.country_name} value={item.country_name}>{item.country_name}</MenuItem>
+                        {countryList.map((item) => (
+                            <MenuItem key={item.country_name} value={item.country_name}>
+                                {item.country_name}
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
             </Box>
+
             <Box sx={{ display: 'flex', gap: 4 }}>
                 {/* Left - E-Com Users Table */}
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6">E-Com Users</Typography>
+                    <Typography variant="h6" sx={{ marginBottom: '8px' }}>E-Com Users</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>User ID</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Customer ID</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Total Invoice</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Total Products</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {visibleRows.map((user) => (
+                                {userData.map((user) => (
                                     <TableRow key={user.id}>
-                                        <TableCell>{user.id}</TableCell>
-                                        <TableCell>{user.totalInvoice}</TableCell>
-                                        <TableCell>{user.totalProducts}</TableCell>
+                                        <TableCell>{user.customer_id}</TableCell>
+                                        <TableCell>{user.invoice_count}</TableCell>
+                                        <TableCell>{user.product_count}</TableCell>
                                         <TableCell>
-                                            <Button variant="contained" onClick={() => setSelectedUser(user)}>View</Button>
+                                            <Button
+                                                variant="contained"
+                                                onClick={async () => {
+                                                    setSelectedUser(user);
+                                                    console.log(user);
+                                                    try {
+                                                        const res = await getRecommendations(user.country, user.customer_id);
+                                                        setRecommendations(res.recommended_products);
+                                                    } catch (error) {
+                                                        setRecommendations([]);
+                                                    }
+                                                }}
+                                            >
+                                                View
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {emptyRows > 0 && (
-                                    <TableRow style={{ height: 53 * emptyRows }}>
-                                        <TableCell colSpan={4} />
-                                    </TableRow>
-                                )}
                             </TableBody>
                             <TableFooter>
                                 <TableRow>
                                     <TablePagination
-                                        rowsPerPageOptions={[8, 16, 32]}
-                                        count={mockUsers.length}
+                                        rowsPerPageOptions={[]}
+                                        count={totalCount}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         onPageChange={handleChangePage}
@@ -180,17 +189,17 @@ export default function Recommendation() {
 
                 {/* Right - Recommendations */}
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6">ML Recommendation</Typography>
+                    <Typography variant="h6" sx={{ marginBottom: '8px' }}>ML Recommendation</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Recommended Products</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Recommended Products {selectedUser && recommendations.length > 0 ? 'For Customer_Id ' + selectedUser.customer_id : '' }</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {selectedUser ? (
-                                    selectedUser.recommendations.map((rec, idx) => (
+                                {selectedUser && recommendations.length > 0 ? (
+                                    recommendations.map((rec, idx) => (
                                         <TableRow key={idx}>
                                             <TableCell>{rec}</TableCell>
                                         </TableRow>

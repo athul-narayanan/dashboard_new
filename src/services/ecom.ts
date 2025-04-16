@@ -8,7 +8,7 @@ export interface EcomUserRequest {
 // Recommendation System
 export const getCountyList = async () => {
     try {
-        const result = await axios.get("http://127.0.0.1:8000/dashboardapi/ecom/country/")
+        const result = await axios.get("https://dashboard-api-production-ceb7.up.railway.app/dashboardapi/ecom/country/")
         return result
     } catch (error) {
         return error
@@ -17,7 +17,7 @@ export const getCountyList = async () => {
 
 export const getRecommendations = async (country: string, userId: number) => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/dashboardapi/ecom/recommender/', {
+        const response = await axios.get('https://dashboard-api-production-ceb7.up.railway.app/dashboardapi/ecom/recommend/', {
             params: {
                 country,
                 user_id: userId,
@@ -32,7 +32,7 @@ export const getRecommendations = async (country: string, userId: number) => {
 
 export const getEcomUsers = async (params: EcomUserRequest) => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/dashboardapi/ecom/users/', params);
+        const response = await axios.post('https://dashboard-api-production-ceb7.up.railway.app/dashboardapi/ecom/user/', params);
         return response.data;
     } catch (error) {
         console.error('Failed to fetch ecom users:', error);
