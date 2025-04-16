@@ -152,6 +152,7 @@ export default function Recommendation() {
                                                 variant="contained"
                                                 onClick={async () => {
                                                     setSelectedUser(user);
+                                                    setRecommendations(null);
                                                     try {
                                                         const res = await getRecommendations(user.country, user.customer_id);
                                                         setRecommendations(res.recommended_products);
