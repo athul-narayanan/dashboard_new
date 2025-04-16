@@ -14,3 +14,12 @@
     animation: hideDebug 0s;
     display: none !important;
   }
+
+  .chat-app {
+    position: fixed;
+    bottom: 5%;
+    right:5%;
+    z-index: 10000;
+    border-radius: 20px;
+    cursor: pointer;
+  }

@@ -1,0 +1,84 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 100vh;
+}
+
+.header{
+    min-height: 50px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width:100%;
+    display: flex;
+    align-items: center;
+}
+
+.output{
+    flex:1;
+    overflow: auto;
+    margin-bottom: 5%;
+    width: 90%
+}
+
+.heading{
+    color: #1976d2;
+    padding: 0% 0% 0% 5%;
+}
+
+.move-back{
+    background-color: #1976d2;
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    margin-left: 2rem;
+    cursor: pointer;
+}
+
+.dashboard{
+    margin-left: 20px
+}
+
+.input{
+    position: fixed;
+    bottom: 2%;
+    width: 90%;
+    height: 10%;
+    padding: 2px;
+    min-height: 100px;
+}
+
+.input input{
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    border: 1px sold rgb(230, 226, 226);
+    font-size: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    outline: none;
+    border: 1px solid #ccc;
+}
+
+.width{
+    width: 100%;
+}
+
+.qns-item{
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    border: 1px sold rgb(230, 226, 226);
+}
+
+.question{
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.answer{
+    font-weight: 600;
+    font-size: 1.5rem;
+}
